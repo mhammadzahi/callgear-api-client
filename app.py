@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 API_KEY = os.getenv("API_KEY")
-api_url = 'https://dataapi.callgear.com/v2.0'
+api_url = 'https://callapi.callgear.com/v4.0'
 
 def start_call():
 
@@ -14,20 +14,11 @@ def start_call():
         "params": {
             "access_token": API_KEY,
             "first_call": "employee",
-            "virtual_phone_number": "74993720692",
+            "virtual_phone_number": "028160531",# dynamic take it from REST APPI
             "direction": "out",
-            "contact": "79260000000",
+            "contact": "971509267545",
             "employee": {
-            "id": 25,
-            "phone_number": "79260000001"
-            },
-            "contact_message": {
-            "type": "tts",
-            "value": "Hello"
-            },
-            "employee_message": {
-            "type": "media",
-            "value": "2561"
+                "id": 25# dynamic -- take it from REST APPI (by email) https://callgear.github.io/data_api/employee/get_employees/
             }
         }
     }
@@ -35,7 +26,7 @@ def start_call():
 
     try:
         response = requests.post(api_url, json=call_request_data)
-        print("Status Code:", response.status_code)
+        #print("Status Code:", response.status_code)
         print("Response Body:", response.text)
         response.raise_for_status()
         data = response.json()
@@ -45,5 +36,26 @@ def start_call():
         print(f"Error during request: {e}")
 
 
+
+def get_user_id(email):
+    request_data = {
+        "email": email
+    }
+
+    try:
+        response = requests.post(api_url, json=request_data)
+        print("[get_user_id] Response Body:", response.text)
+        response.raise_for_status()
+        data = response.json()
+        print(json.dumps(data, indent=2))
+        return "ok"
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error during request: {e}")
+        return None
+
+
+
 if __name__ == "__main__":
-    get_calls_report()
+    start_call()
+
