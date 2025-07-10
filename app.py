@@ -5,20 +5,36 @@ load_dotenv()
 API_KEY = os.getenv("API_KEY")
 api_url = 'https://dataapi.callgear.com/v2.0'
 
-def get_calls_report():
-    request_data = {
+def start_call():
+
+    call_request_data = {
         "jsonrpc": "2.0",
-        "id": "number",
-        "method": "get.calls_report",
+        "method": "start.employee_call",
+        "id": "req1",
         "params": {
             "access_token": API_KEY,
-            "date_from": "2025-07-01 00:00:00",
-            "date_till": "2025-07-09 23:59:59"
+            "first_call": "employee",
+            "virtual_phone_number": "74993720692",
+            "direction": "out",
+            "contact": "79260000000",
+            "employee": {
+            "id": 25,
+            "phone_number": "79260000001"
+            },
+            "contact_message": {
+            "type": "tts",
+            "value": "Hello"
+            },
+            "employee_message": {
+            "type": "media",
+            "value": "2561"
+            }
         }
     }
 
+
     try:
-        response = requests.post(api_url, json=request_data)
+        response = requests.post(api_url, json=call_request_data)
         print("Status Code:", response.status_code)
         print("Response Body:", response.text)
         response.raise_for_status()
