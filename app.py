@@ -5,7 +5,7 @@ load_dotenv()
 API_KEY = os.getenv("API_KEY")
 api_url = 'https://callapi.callgear.com/v4.0'
 
-def start_call():
+def start_call(id):
 
     call_request_data = {
         "jsonrpc": "2.0",
@@ -18,6 +18,7 @@ def start_call():
             "direction": "out",
             "contact": "971509267545",
             "employee": {
+                #"id": id,
                 "id": 25# dynamic -- take it from REST APPI (by email) https://callgear.github.io/data_api/employee/get_employees/
             }
         }
@@ -57,5 +58,6 @@ def get_user_id(email):
 
 
 if __name__ == "__main__":
-    start_call()
+    #id = get_user_id("m.shatnawi@miramar-uae.com"):
+    start_call(5)
 
