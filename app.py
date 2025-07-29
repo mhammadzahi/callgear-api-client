@@ -29,7 +29,7 @@ def get_calls_report(from_date, to_date):
         if 'result' in data and 'data' in data['result'] and data['result']['data']:
             call_data = data['result']['data']
             
-            csv_file_name = f'calls_report_{from_date}_{to_date}.csv'
+            csv_file_name = f'Calls_Report_{from_date}__To__{to_date}.csv'
             
             # Get the headers from the keys of the first dictionary in the list
             headers = call_data[0].keys()
