@@ -76,6 +76,3 @@ def get_calls_report(from_, to_, API_KEY):
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 
-
-if __name__ == "__main__":
-    get_calls_report("2025-07-15 00:00:00", "2025-07-15 00:00:00", API_KEY)

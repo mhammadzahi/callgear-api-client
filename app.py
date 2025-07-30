@@ -36,8 +36,16 @@ def get_api_key(api_key: str = Security(api_key_header)):
 def read_root():
     return {"message": "API for Date Validation, V1.3.0"}
 
-@app.post("/validate-dates/")
-def validate_date_range(date_range: DateRange, api_key: str = Depends(get_api_key)):
+@app.post("/get-calls-report")
+def get_calls_report(date_range: DateRange, api_key: str = Depends(get_api_key)):
+    return {
+        "message": "API key is valid. Dates received successfully.",
+        "received_start_date": date_range.start_date,
+        "received_end_date": date_range.end_date,
+    }
+
+@app.post("/get-chat-messages-report")
+def get_chat_messages_report(date_range: DateRange, api_key: str = Depends(get_api_key)):
     return {
         "message": "API key is valid. Dates received successfully.",
         "received_start_date": date_range.start_date,
@@ -46,4 +54,5 @@ def validate_date_range(date_range: DateRange, api_key: str = Depends(get_api_ke
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)
+    #uvicorn.run("gps-api:app", host="0.0.0.0", port=8001, reload=True)# dev
+    uvicorn.run(app, host="0.0.0.0", port=8001)# prod
