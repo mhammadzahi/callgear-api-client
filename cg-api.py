@@ -5,7 +5,7 @@ from fastapi import Depends, FastAPI, HTTPException, Security, status
 from fastapi.security import APIKeyHeader
 from pydantic import BaseModel
 from functions.calls_report import get_calls_report
-#from functions.chat_report import 
+from functions.chat_report import get_chat_messages_report
 
 load_dotenv()
 
@@ -37,14 +37,12 @@ def calls_report(date_range: DateRange, api_key: str = Depends(get_api_key)):
     }
 
 
-# @app.post("/get-chat-messages-report")
-# def chat_messages_report(date_range: DateRange, api_key: str = Depends(get_api_key)):
-#     chat_messages_report(date_range.start_date, date_range.end_date, CG_API_KEY)
-#     return {
-#         "message": "API key is valid. Dates received successfully.",
-#         "received_start_date": date_range.start_date,
-#         "received_end_date": date_range.end_date,
-#     }
+@app.post("/get-chat-messages-report")
+def chat_messages_report(date_range: DateRange, api_key: str = Depends(get_api_key)):
+    chat_report = get_chat_messages_report(date_range.start_date, date_range.end_date, CG_API_KEY)
+    return {
+        "chat_messages_report": chat_report
+    }
 
 
 

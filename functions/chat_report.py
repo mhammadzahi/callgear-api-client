@@ -19,17 +19,20 @@ def get_chat_messages_report(from_, to_, API_KEY):
 
     try:
         response = requests.post(api_url, json=request_data)
-        print("Status Code:", response.status_code)
+        #`print("Status Code:", response.status_code)
         response.raise_for_status()
         data = response.json()
-        print(json.dumps(data, indent=3))
+        #print(json.dumps(data, indent=3))
+        return data
 
     except requests.exceptions.RequestException as e:
         print(f"Error during request: {e}")
+        return None
 
     except (KeyError, IndexError) as e:
         print(f"Error processing response data: Could not find chat messages data. Details: {e}")
+        return None
 
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
-
+        return None
