@@ -20,10 +20,10 @@ def get_calls_report(from_, to_, API_KEY):
 
     try:
         response = requests.post(api_url, json=request_data)
-        print("Status Code:", response.status_code)
+        #print("Status Code:", response.status_code)
         response.raise_for_status()
         data = response.json()
-        print("Response JSON received. Processing data...")
+        #print("Response JSON received. Processing data...")
 
         # Check if the expected data is present in the response
         if 'result' in data and 'data' in data['result'] and data['result']['data']:
@@ -59,9 +59,9 @@ def get_calls_report(from_, to_, API_KEY):
             #     writer = csv.DictWriter(csvfile, fieldnames=headers)
             #     writer.writeheader()
             #     writer.writerows(call_data)
-
+            #print(call_data)
             return call_data
-
+    
         else:
             print("\nNo call data found in the response to generate a CSV file.")
             return None

@@ -13,8 +13,8 @@ API_KEY = os.getenv("API_KEY")
 CG_API_KEY = os.getenv("CG_API_KEY")
 
 class DateRange(BaseModel):
-    start_date: datetime
-    end_date: datetime
+    start_date: str
+    end_date: str
 
 
 app = FastAPI()
@@ -31,11 +31,9 @@ def get_api_key(api_key: str = Security(api_key_header)):
 
 @app.post("/get-calls-report")
 def calls_report(date_range: DateRange, api_key: str = Depends(get_api_key)):
-    get_calls_report(date_range.start_date, date_range.end_date, CG_API_KEY)
+    call_report = get_calls_report(date_range.start_date, date_range.end_date, CG_API_KEY)
     return {
-        "message": "API key is valid. Dates received successfully.",
-        "received_start_date": date_range.start_date,
-        "received_end_date": date_range.end_date,
+        "calls_report": call_report
     }
 
 
