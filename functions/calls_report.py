@@ -29,7 +29,7 @@ def get_calls_report(from_, to_, API_KEY):
         if 'result' in data and 'data' in data['result'] and data['result']['data']:
             call_data = data['result']['data']
             
-            # --- Data Transformation Start ---
+            # ----------- Data Transformation Start ---------
             # Iterate over each record to add the new URL column
             for record in call_data:
                 communication_id = record.get('communication_id')
@@ -48,31 +48,33 @@ def get_calls_report(from_, to_, API_KEY):
                 else:
                     # Add an empty string if there are no call records to link to
                     record['call_records_url'] = ''
-            # --- Data Transformation End ---
+            # --------------- Data Transformation End ------------------------
 
-            # --- CSV Generation Start ---
-            csv_file_name = 'calls_report.csv'
-            
+        
             # Get headers from the keys of the first *modified* dictionary.
             # This ensures the new 'call_records_url' column is included.
-            headers = call_data[0].keys()
-            
+            #headers = call_data[0].keys()
             # Write the transformed data to the CSV file
-            with open(csv_file_name, 'w', newline='', encoding='utf-8') as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=headers)
-                writer.writeheader()
-                writer.writerows(call_data)
-            
-            print(f"\nSuccessfully generated CSV file with call record links: {csv_file_name}")
+            # with open('calls_report.csv', 'w', newline='', encoding='utf-8') as csvfile:
+            #     writer = csv.DictWriter(csvfile, fieldnames=headers)
+            #     writer.writeheader()
+            #     writer.writerows(call_data)
+
+            return call_data
+
         else:
             print("\nNo call data found in the response to generate a CSV file.")
+            return None
 
     except requests.exceptions.RequestException as e:
         print(f"Error during request: {e}")
+        return None
 
     except (KeyError, IndexError) as e:
         print(f"Error processing response data: Could not find call data. Details: {e}")
+        return None
 
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        print(e)
+        return None
 
