@@ -43,8 +43,8 @@ def get_calls_report(from_, to_, API_KEY):
                         link = f"https://app.callgear.ae/system/media/talk/{communication_id}/{rec_id}/"
                         links.append(link)
                     
-                    # Add the generated links to a new field, joined by '**'
-                    record['call_records_url'] = '**'.join(links)
+                    # Add the generated links to a new field, joined by '*'
+                    record['call_records_url'] = '*'.join(links)
                 else:
                     # Add an empty string if there are no call records to link to
                     record['call_records_url'] = ''
