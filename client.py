@@ -3,13 +3,14 @@ import requests
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
-# Load environment variables
+
 load_dotenv()
 
 API_KEY = os.getenv("API_KEY")
 BASE_URL = "http://localhost:8004"
 
-# Calculate yesterday's date range
+
+
 yesterday = datetime.now() - timedelta(days=1)
 start_date = yesterday.strftime("%Y-%m-%d 00:00:00")
 end_date = yesterday.strftime("%Y-%m-%d 23:59:59")
@@ -23,7 +24,7 @@ payload = {
     "start_date": start_date,
     "end_date": end_date
 }
-print(payload)
+
 
 def run_reports():
     
