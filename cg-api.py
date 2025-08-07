@@ -3,6 +3,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Security, status
 from fastapi.security import APIKeyHeader
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from functions.calls_report import get_calls_report
 from functions.chat_report import get_chat_messages_report
@@ -34,28 +35,38 @@ def get_api_key(api_key: str = Security(api_key_header)):
 
 
 
+
 @app.post("/get-calls-report")
 def calls_report(date_range: DateRange, api_key: str = Depends(get_api_key)):
+    call_report = get_calls_report(date_range.start_date, date_range.end_date, CG_API_KEY)
 
-    if not (call_report := get_calls_report(date_range.start_date, date_range.end_date, CG_API_KEY)):
-        return {"success": False}, 400
+    if not call_report:
+        return JSONResponse(content={"success": False}, status_code=400)
 
     if not db.insert_call_reports(call_report):
-        return {"success": False}, 500
+        return JSONResponse(content={"success": False}, status_code=500)
 
-    return {"success": True}, 200
+    return JSONResponse(content={"success": True}, status_code=200)
 
 
-# @app.post("/get-chat-messages-report")
-# def chat_messages_report(date_range: DateRange, api_key: str = Depends(get_api_key)):
-#     chat_report = get_chat_messages_report(date_range.start_date, date_range.end_date, CG_API_KEY)
-#     db.sync_chat_messages_report(chat_report)
-#     return {"success": True}
+
+@app.post("/get-chat-messages-report")
+def chat_messages_report(date_range: DateRange, api_key: str = Depends(get_api_key)):
+    chat_report = get_chat_messages_report(date_range.start_date, date_range.end_date, CG_API_KEY)
+
+    if not chat_report:
+        raise HTTPException(detail="No chat report found.", status_code=400)
+
+    if not db.insert_chat_messages_reports(chat_report):
+        raise HTTPException(detail="Failed to sync chat messages report.", status_code=500)
+
+    return JSONResponse(content={"success": True}, status_code=200)
+
 
 
 @app.get("/")
 def read_root():
-    return {"message": "API, V1.3.0"}
+    return {"message": "API, V1.2.0"}
 
 if __name__ == "__main__":
     import uvicorn
