@@ -1,0 +1,17 @@
+sudo nano /etc/systemd/system/callgearapi.service
+
+
+[Unit]
+Description=callgear api calls and chats reports
+After=network.target
+
+[Service]
+User=mohammad
+WorkingDirectory=/home/mohammad/callgear-api-client
+ExecStart=/bin/bash -c 'source /home/mohammad/callgear-api-client/env/bin/activate && python cg-api.py'
+Restart=always
+StandardOutput=append:/home/mohammad/callgear-api-client/callgearapi.log
+StandardError=append:/home/mohammad/callgear-api-client/callgearapi-errors.log
+
+[Install]
+WantedBy=multi-user.target

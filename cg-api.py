@@ -36,9 +36,14 @@ def get_api_key(api_key: str = Security(api_key_header)):
 
 @app.post("/get-calls-report")
 def calls_report(date_range: DateRange, api_key: str = Depends(get_api_key)):
-    call_report = get_calls_report(date_range.start_date, date_range.end_date, CG_API_KEY)
-    db.insert_call_reports(call_report)
-    return {"success": True}
+
+    if not (call_report := get_calls_report(date_range.start_date, date_range.end_date, CG_API_KEY)):
+        return {"success": False}, 400
+
+    if not db.insert_call_reports(call_report):
+        return {"success": False}, 500
+
+    return {"success": True}, 200
 
 
 # @app.post("/get-chat-messages-report")
