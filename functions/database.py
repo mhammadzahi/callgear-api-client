@@ -1,6 +1,8 @@
 import psycopg2
 import psycopg2.extras
 from psycopg2 import sql
+import json
+
 
 class Database:
     def __init__(self, db_url):
@@ -74,3 +76,95 @@ class Database:
     #     # Call the main batch function with a list containing just one item
     #     inserted_ids = self.insert_call_reports([report_dict])
     #     return inserted_ids[0] if inserted_ids else None
+
+
+
+    def insert_chat_messages_reports(self, chat_report):
+        """
+        Inserts or updates multiple chat messages from a report dictionary.
+
+        This function parses the main report dictionary, extracts the list of messages,
+        and uses a single bulk "upsert" command for high efficiency. If a message
+        with the same 'id' already exists, it will be updated; otherwise, it will be inserted.
+
+        :param chat_report: The raw dictionary containing the list of chat messages.
+        :return: A list of the integer IDs for all successfully inserted/updated messages.
+        """
+        # 1. Extract the list of messages from the main dictionary
+        try:
+            messages_list = chat_report['result']['data']
+        except (KeyError, TypeError):
+            print("Error: 'chat_report' dictionary is malformed or missing data. Expected structure: {'result': {'data': [...]}}")
+            return []
+
+        if not messages_list:
+            print("Received a report with no messages. Nothing to insert.")
+            return []
+
+        # 2. Define the columns that match your 'chat_logs' table
+        # This ensures the data maps to the correct database fields.
+        columns = [
+            'id', 'text', 'source', 'chat_id', 'resource', 'date_time',
+            'channel_id', 'visitor_id', 'employee_id', 'channel_type',
+            'is_group_chat', 'employee_full_name'
+        ]
+
+        # 3. Prepare the list of values (as tuples) for insertion
+        # This loop transforms the list of dictionaries into a list of tuples.
+        values_list = []
+        for msg in messages_list:
+            # For the 'resource' column (which is JSONB), we serialize the dict to a JSON string.
+            # psycopg2 will correctly handle the conversion to the JSONB type.
+            resource_json = None
+            if msg.get('resource') is not None:
+                resource_json = json.dumps(msg.get('resource'))
+            
+            values_tuple = tuple(
+                json.dumps(msg.get(col)) if col == 'resource' and msg.get(col) is not None else msg.get(col)
+                for col in columns
+            )
+            values_list.append(values_tuple)
+
+
+        # 4. Construct the bulk UPSERT query using ON CONFLICT
+        # This powerful query inserts new rows. If a row with a conflicting 'id'
+        # already exists, it updates that existing row instead of causing an error.
+        update_clause = sql.SQL(', ').join(
+            sql.SQL("{} = EXCLUDED.{}").format(sql.Identifier(col), sql.Identifier(col))
+            for col in columns if col != 'id' # Exclude the ID from the update set
+        )
+
+        insert_query = sql.SQL(
+            """
+            INSERT INTO chat_reports ({fields}) VALUES %s
+            ON CONFLICT (id) DO UPDATE SET {update_fields}
+            RETURNING id
+            """
+        ).format(
+            fields=sql.SQL(', ').join(map(sql.Identifier, columns)),
+            update_fields=update_clause
+        )
+
+        # 5. Execute the query and commit the transaction
+        try:
+            with self.connect() as conn:
+                with conn.cursor() as cur:
+                    # execute_values is the most efficient way to perform bulk operations in psycopg2
+                    inserted_ids = psycopg2.extras.execute_values(
+                        cur, insert_query, values_list, fetch=True
+                    )
+                conn.commit()
+
+            # Flatten the list of tuples returned by the RETURNING clause
+            flat_ids = [item[0] for item in inserted_ids]
+            print(f"Successfully inserted or updated {len(flat_ids)} chat messages.")
+            return flat_ids
+
+        except (Exception, psycopg2.DatabaseError) as err:
+            print(f"Error during bulk chat message insert: {err}")
+            # Rollback the transaction on error
+            if 'conn' in locals() and conn:
+                conn.rollback()
+            return []
+
+   

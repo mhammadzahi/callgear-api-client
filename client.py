@@ -27,12 +27,17 @@ payload = {
 
 
 def run_reports():
-    
+    print("- - - - - - - - - - -- -- - - - - - - - - - - - - - - - - - - - -- -- - - - - - - - - -")
+    print(start_date)
+    print(end_date)
+
     calls_response = requests.post(f"{BASE_URL}/save-calls-report", json=payload, headers=headers)
     print("Calls report response:", calls_response.status_code, calls_response.json())
 
-    #chat_response = requests.post(f"{BASE_URL}/save-chat-messages-report", json=payload, headers=headers)
-    #print("Chat messages report response:", chat_response.status_code, chat_response.json())
+    chat_response = requests.post(f"{BASE_URL}/save-chat-messages-report", json=payload, headers=headers)
+    print("Chat messages report response:", chat_response.status_code, chat_response.json())
+    print("- - - - - - - - - - -- -- - - - - - - - - - - - - - - - - - - - -- -- - - - - - - - - -")
+
 
 if __name__ == "__main__":
     run_reports()

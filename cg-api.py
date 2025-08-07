@@ -70,5 +70,5 @@ def read_root():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("cg-api:app", host="0.0.0.0", port=8004, reload=True)# dev
-    #uvicorn.run(app, host="0.0.0.0", port=8004)# prod
+    #uvicorn.run("cg-api:app", host="0.0.0.0", port=8004, reload=True)# dev
+    uvicorn.run(app, host="0.0.0.0", port=8004)# prod
