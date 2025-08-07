@@ -35,8 +35,7 @@ def get_api_key(api_key: str = Security(api_key_header)):
 
 
 
-
-@app.post("/get-calls-report")
+@app.post("/save-calls-report")
 def calls_report(date_range: DateRange, api_key: str = Depends(get_api_key)):
     call_report = get_calls_report(date_range.start_date, date_range.end_date, CG_API_KEY)
 
@@ -50,7 +49,7 @@ def calls_report(date_range: DateRange, api_key: str = Depends(get_api_key)):
 
 
 
-@app.post("/get-chat-messages-report")
+@app.post("/save-chat-messages-report")
 def chat_messages_report(date_range: DateRange, api_key: str = Depends(get_api_key)):
     chat_report = get_chat_messages_report(date_range.start_date, date_range.end_date, CG_API_KEY)
 
@@ -67,6 +66,7 @@ def chat_messages_report(date_range: DateRange, api_key: str = Depends(get_api_k
 @app.get("/")
 def read_root():
     return {"message": "API, V1.2.0"}
+
 
 if __name__ == "__main__":
     import uvicorn
